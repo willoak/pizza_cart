@@ -95,8 +95,6 @@ qs(".pizzaInfo--addButton").addEventListener("click",()=>{
     //se for mais que -1, significa que existe o produto no carrinho, entao sera atualizado apenas a quantidade do mesmo no carrinho. o findindex identifica o item por isso podemos usar o key para atualizar o cart
     let key = cart.findIndex( (item) => item.identifier == identifier);
 
-    console.log(key);
-
     if( key > -1 ) {
         cart[key].qtd += modalQtd
     } else {
@@ -110,4 +108,71 @@ qs(".pizzaInfo--addButton").addEventListener("click",()=>{
     }
 
     closeModal();
+    updateCart();
 });
+
+updateCart = () => {
+    if(cart.length > 0) {
+        //resetar o carrinho sempre que add um item
+        console.log(cart.length)
+        qs(".cart").innerHTML = "";
+        qs("aside").classList.add("show");
+
+        let subtotal = 0, desconto = 0, total = 0;
+
+        //identificando as pizzas adicionadas no cart, o for foi usado para verificar se no nosso carrinho tem o produto que esta no pizzaJson, se sim, ele retorna o item para podermos mostrar os dados no carrinho
+        for (let i in cart) {
+            
+            let pizzaItem = pizzaJson.find( (item) => item.id == cart[i].id);
+            subtotal += pizzaItem.price * cart[i].qtd;
+            console.log(subtotal)
+
+            let pizzaNameSize = cart[i].size;
+
+            switch (pizzaNameSize) {
+                case 0:
+                    pizzaNameSize = "P"
+                    break;
+                case 1:
+                    pizzaNameSize = "M"
+                    break;
+                case 2:
+                    pizzaNameSize = "G"
+                    break   
+            }
+
+            let pizzaName = `${pizzaItem.name} (${pizzaNameSize})`;
+
+            let cartItems = qs(".models .cart--item").cloneNode(true);
+
+            cartItems.querySelector("img").src = pizzaItem.img;
+            cartItems.querySelector(".cart--item-nome").innerHTML = pizzaName;
+            cartItems.querySelector(".cart--item--qt").innerHTML = cart[i].qtd;
+            cartItems.querySelector(".cart--item-qtmais").addEventListener("click", ()=>{
+                cart[i].qtd++;
+                updateCart();
+            });
+            cartItems.querySelector(".cart--item-qtmenos").addEventListener("click", ()=>{
+                if(cart[i].qtd > 1) {
+                    cart[i].qtd--;
+                } else {
+                    cart.splice(i,1);
+                }
+                updateCart();
+            });
+
+            qs(".cart").append(cartItems);
+
+        }
+
+        desconto = subtotal * .1;
+        total = subtotal - desconto;
+
+        qs(".subtotal span:last-child").innerHTML = real(subtotal);
+        qs(".desconto span:last-child").innerHTML = real(desconto);
+        qs(".total span:last-child").innerHTML = real(total);
+
+    } else {
+        qs("aside").classList.remove("show");
+    }
+}
