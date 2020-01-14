@@ -69,11 +69,12 @@ qs(".pizzaInfo--qtmenos").addEventListener("click",()=>{
 
 closeModal = () => {
     qs(".pizzaWindowArea").style.display = "none";
-
     //animacao do modal fechando - fazer depois
 }
 
-qs(".pizzaInfo--cancelButton").addEventListener("click",closeModal);
+qsa(".pizzaInfo--cancelButton,.pizzaInfo--cancelMobileButton").forEach( (item)=> {
+    item.addEventListener("click", closeModal)
+});
 
 //adicionar class de item selecionado no modal
 qsa(".pizzaInfo--size").forEach( (size, sizeIndex) => {
@@ -112,9 +113,9 @@ qs(".pizzaInfo--addButton").addEventListener("click",()=>{
 });
 
 updateCart = () => {
+    qs(".menu-openner span").innerHTML = cart.length;
     if(cart.length > 0) {
         //resetar o carrinho sempre que add um item
-        console.log(cart.length)
         qs(".cart").innerHTML = "";
         qs("aside").classList.add("show");
 
@@ -174,5 +175,15 @@ updateCart = () => {
 
     } else {
         qs("aside").classList.remove("show");
+        qs("aside").style.left = "100vw";
     }
 }
+
+qs(".menu-openner").addEventListener("click",()=>{
+    if(cart.length > 0) {
+        qs("aside").style.left = 0;
+    }
+});
+qs(".menu-closer").addEventListener("click",()=>{
+    qs("aside").style.left = "100vw";
+});
